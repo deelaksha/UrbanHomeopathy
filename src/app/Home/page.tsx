@@ -93,6 +93,7 @@ const Home = () => {
               Where Nature Meets Modern Healing
             </p>
             <motion.button
+               onClick={() => window.location.href = '/Appointment'}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-green-600 text-white px-8 py-4 rounded-full text-lg font-semibold 
