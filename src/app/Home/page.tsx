@@ -4,11 +4,10 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Header from '../Header/page';
 import Footer from '../Footer/page';
-import Link from 'next/link';
 import TestimonialShowcase from '../Rating/page';
 import {
-  Leaf, Star, Clock, Phone, Calendar, Shield,
-  Activity, Heart, Wind, Zap, Users, CheckCircle
+  Leaf, Star, Calendar, Shield,
+   Heart, Users, CheckCircle
 } from 'lucide-react';
 
 const Home = () => {
@@ -216,9 +215,11 @@ const Home = () => {
         className="relative w-full max-w-xs md:max-w-md rounded-lg overflow-hidden flex-shrink-0"
       >
         {/* Image of Dr. Tejasmini with interactive styling */}
-        <img
+        <Image
           src="/home_images/dr.png" // Replace this with the actual image path
-          alt="Dr. Tejaswini"
+          alt="Dr. Tejasmini"
+          width={500} // Set a reasonable width for the image
+          height={500} // Set a reasonable height for the image
           className="rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-500 hover:shadow-green-300 border-4 border-green-200"
         />
         {/* Subtle floating animation effect */}
@@ -227,6 +228,7 @@ const Home = () => {
     </div>
   </div>
 </section>
+
  
 
 <TestimonialShowcase/>

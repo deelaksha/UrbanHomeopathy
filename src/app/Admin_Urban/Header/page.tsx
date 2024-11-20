@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Leaf, Home, Users, Phone, BookOpen, Calendar, Youtube, Blend  } from 'lucide-react';
+import { Menu, X, Leaf, Home, Calendar, Youtube, Blend  } from 'lucide-react';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);

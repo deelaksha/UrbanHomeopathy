@@ -49,7 +49,7 @@ const CreateBlog = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${folderName}/${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
 
-      const { data, error } = await supabase.storage
+      const {error } = await supabase.storage
         .from(bucketName)
         .upload(fileName, file, {
           cacheControl: '3600',

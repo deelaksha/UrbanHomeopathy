@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import Header from "../Header/page";
 
@@ -77,7 +77,7 @@ export default function AppointmentBookingForm() {
       setError(null);
       alert(`OTP sent to ${form.phone}: ${generatedOtp}`);
     } catch (err) {
-      setError("Failed to send OTP. Please try again.");
+      setError("Failed to send OTP. Please try again."+err);
     }
   };
 
@@ -125,7 +125,7 @@ export default function AppointmentBookingForm() {
     }
 
     try {
-      const { data, error } = await supabase.from("appointments").insert([form]);
+      const {error } = await supabase.from("appointments").insert([form]);
 
       if (error) throw error;
 
