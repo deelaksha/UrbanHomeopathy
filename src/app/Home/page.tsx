@@ -12,8 +12,6 @@ import {
 
 const Home = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [activeService, setActiveService] = useState(null);
-
   useEffect(() => {
     setIsLoaded(true);
   }, []);
