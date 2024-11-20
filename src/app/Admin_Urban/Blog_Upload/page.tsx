@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { supabase } from '../../../../lib/supabaseClient';
+import Header from '../Header/page';
 
 type BlogPost = {
   title: string;
@@ -127,6 +128,8 @@ const CreateBlog = () => {
   };
 
   return (
+    <>
+    <Header/>
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -293,6 +296,7 @@ const CreateBlog = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
