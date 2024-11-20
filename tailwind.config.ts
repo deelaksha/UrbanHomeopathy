@@ -11,9 +11,15 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        green: {
+          950: '#1a2f1a', // Custom dark green
+        }
       },
     },
   },
   plugins: [],
 };
+// tailwind.config.js
+
+
 export default config;
