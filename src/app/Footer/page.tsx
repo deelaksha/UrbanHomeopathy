@@ -1,4 +1,6 @@
 'use client'
+import { useRouter } from 'next/navigation'; // Correct for Next.js navigation
+
 import React from 'react';
 import { 
   Facebook, 
@@ -15,6 +17,8 @@ import {
 } from 'lucide-react';
 
 const Footer = () => {
+  const router = useRouter(); // Next.js routing system
+
   const resourceLinks = [
     'Articles & Blog',
     'Research Studies',
@@ -163,6 +167,7 @@ const Footer = () => {
                 </div>
               </div>
               <button
+                onClick={() => router.push('/Appointment')}
                 className="mt-4 w-full bg-green-600 text-white px-6 py-3 rounded-lg
                          flex items-center justify-center space-x-2 hover:bg-green-700
                          transform hover:scale-105 transition-all duration-300"
