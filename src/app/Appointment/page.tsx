@@ -1,350 +1,271 @@
 'use client'
-import React, { useState } from 'react';
-import { Calendar, Clock, User } from 'lucide-react';
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { supabase } from "../../../lib/supabaseClient";
 
-// Types
-interface AppointmentType {
-  id: string;
-  type: 'Initial Consultation' | 'Follow-up' | 'Quick Review';
-  duration: number;
-  price: number;
-  description: string;
-}
+const isValidPhoneNumber = (phone: string): boolean => /^[0-9]{10}$/.test(phone);
+const generateOTP = (): string => Math.floor(100000 + Math.random() * 900000).toString();
 
-interface PatientInfo {
-  name: string;
-  email: string;
-  phone: string;
-  age: number;
-  gender: 'Male' | 'Female' | 'Other';
-  previousVisit: boolean;
-  mainComplaints: string;
-  currentMedications?: string;
-}
-
-interface ValidationErrors {
-  [key: string]: string;
-}
-
-const appointmentTypes: AppointmentType[] = [
-  {
-    id: '1',
-    type: 'Initial Consultation',
-    duration: 60,
-    price: 150,
-    description: 'Comprehensive first visit with detailed case analysis',
-  },
-  {
-    id: '2',
-    type: 'Follow-up',
-    duration: 45,
-    price: 100,
-    description: 'Review progress and adjust treatment',
-  },
-  {
-    id: '3',
-    type: 'Quick Review',
-    duration: 30,
-    price: 75,
-    description: 'Brief check-in for existing patients',
-  },
+const TIME_SLOTS = [
+  { value: "09:00", label: "9:00 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "13:00", label: "1:00 PM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "17:00", label: "5:00 PM" },
+  { value: "18:00", label: "6:00 PM" },
 ];
 
-const Appointment = () => {
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedTime, setSelectedTime] = useState<string>('');
-  const [selectedType, setSelectedType] = useState<string>('');
-  const [patientInfo, setPatientInfo] = useState<Partial<PatientInfo>>({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [bookingComplete, setBookingComplete] = useState<boolean>(false);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+export default function AppointmentBookingForm() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    disease_description: "",
+    appointment_date: "",
+    appointment_time: "",
+  });
+  const [otp, setOtp] = useState("");
+  const [enteredOtp, setEnteredOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isBlockedDate, setIsBlockedDate] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
-  const timeSlots = [
-    '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
-    '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM',
-  ];
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
 
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth();
-  const currentYear = currentDate.getFullYear();
-
-  const validateEmail = (email: string): boolean => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (name === "appointment_date") {
+      checkBlockedDate(value);
+      fetchBookedSlots(value); // Fetch booked slots for the selected date
+    }
   };
 
-  const validatePhone = (phone: string): boolean => {
-    return /^\d{10}$/.test(phone.replace(/[-()\s]/g, ''));
+  const fetchBookedSlots = async (selectedDate: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("appointment_time")
+        .eq("appointment_date", selectedDate);
+
+      if (error) throw error;
+
+      // Extract booked times from the response
+      const booked = data.map((appointment: { appointment_time: string }) => appointment.appointment_time);
+      setBookedSlots(booked);
+    } catch (err) {
+      console.error("Error fetching booked slots:", err);
+      setError("Unable to check available time slots.");
+    }
   };
 
-  const validateForm = (): boolean => {
-    const errors: ValidationErrors = {};
-
-    if (!patientInfo.name?.trim()) {
-      errors.name = 'Name is required';
-    }
-    if (!patientInfo.email?.trim()) {
-      errors.email = 'Email is required';
-    } else if (!validateEmail(patientInfo.email)) {
-      errors.email = 'Invalid email format';
-    }
-    if (!patientInfo.phone?.trim()) {
-      errors.phone = 'Phone is required';
-    } else if (!validatePhone(patientInfo.phone)) {
-      errors.phone = 'Invalid phone format';
-    }
-    if (!patientInfo.mainComplaints?.trim()) {
-      errors.mainComplaints = 'Please describe your main complaints';
+  const handleSendOtp = async () => {
+    if (!isValidPhoneNumber(form.phone)) {
+      setError("Invalid phone number. Please enter a 10-digit phone number.");
+      return;
     }
 
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    try {
+      const generatedOtp = generateOTP();
+      setOtp(generatedOtp);
+      setIsOtpSent(true);
+      setError(null);
+      alert(`OTP sent to ${form.phone}: ${generatedOtp}`);
+    } catch (err) {
+      setError("Failed to send OTP. Please try again.");
+    }
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+  const handleVerifyOtp = () => {
+    if (enteredOtp === otp) {
+      setIsOtpVerified(true);
+      setError(null);
+    } else {
+      setError("Invalid OTP. Please try again.");
+    }
+  };
 
-    setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setBookingComplete(true);
-    setIsSubmitting(false);
+  const checkBlockedDate = async (selectedDate: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("blocked_date")
+        .select("date")
+        .eq("date", selectedDate);
+
+      if (error) throw error;
+
+      setIsBlockedDate(data && data.length > 0); // If data is found, it's a blocked date
+    } catch (err) {
+      console.error("Error fetching blocked dates:", err);
+      setError("Unable to check availability for the selected date.");
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!isOtpVerified) {
+      setError("Please verify the OTP before submitting.");
+      return;
+    }
+
+    if (!form.name || !form.email || !form.phone || !form.disease_description || !form.appointment_date || !form.appointment_time) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (isBlockedDate) {
+      setError("The selected date is not available. Please choose a different date.");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.from("appointments").insert([form]);
+
+      if (error) throw error;
+
+      alert("Appointment booked successfully!");
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        disease_description: "",
+        appointment_date: "",
+        appointment_time: "",
+      });
+      setIsOtpSent(false);
+      setIsOtpVerified(false);
+      setOtp("");
+      setEnteredOtp("");
+    } catch (error) {
+      console.error("Error inserting data:", error);
+      setError("There was an error submitting your appointment. Please try again.");
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="bg-white shadow-xl rounded-lg transition-all duration-300">
-        <div className="bg-gradient-to-r from-emerald-500 to-green-600 text-white p-6 rounded-t-lg">
-          <h2 className="text-2xl font-bold flex items-center justify-between">
-            Homeopathy Appointment Booking
-            {currentStep === 1 && <Calendar className="w-6 h-6" />}
-            {currentStep === 2 && <Clock className="w-6 h-6" />}
-            {currentStep === 3 && <User className="w-6 h-6" />}
-          </h2>
-          <div className="flex justify-between text-sm mt-2">
-            <span className={`font-medium ${currentStep >= 1 ? 'text-white' : 'text-gray-300'}`}>
-              1. Select Date & Time
-            </span>
-            <span className={`font-medium ${currentStep >= 2 ? 'text-white' : 'text-gray-300'}`}>
-              2. Choose Consultation
-            </span>
-            <span className={`font-medium ${currentStep >= 3 ? 'text-white' : 'text-gray-300'}`}>
-              3. Patient Details
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-green-50 rounded-xl shadow-lg p-8">
+        <h1 className="text-3xl font-bold text-green-700 mb-6 text-center">Book Appointment</h1>
+        
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
-        <div className="p-6">
-          {currentStep === 1 && (
-            <div className="space-y-6">
-              <div className="text-green-600 font-semibold mb-4">
-                {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
-              </div>
-
-              <div className="grid grid-cols-7 gap-1">
-                {days.map((day) => (
-                  <div key={day} className="text-center font-semibold text-gray-600 p-2">
-                    {day}
-                  </div>
-                ))}
-
-                {Array(new Date(currentYear, currentMonth, 1).getDay())
-                  .fill(null)
-                  .map((_, index) => (
-                    <div key={`empty-${index}`} className="p-2" />
-                  ))}
-
-                {Array(new Date(currentYear, currentMonth + 1, 0).getDate())
-                  .fill(null)
-                  .map((_, index) => {
-                    const day = index + 1;
-                    const date = `${currentYear}-${(currentMonth + 1)
-                      .toString()
-                      .padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-
-                    return (
-                      <div
-                        key={day}
-                        onClick={() => setSelectedDate(date)}
-                        className={`
-                          p-2 text-center cursor-pointer transition-all duration-300
-                          hover:bg-green-100 rounded-lg
-                          ${selectedDate === date ? 'bg-green-500 text-white' : ''}
-                        `}
-                      >
-                        {day}
-                      </div>
-                    );
-                  })}
-              </div>
-
-              {selectedDate && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-green-700">Available Times</h3>
-                  <div className="grid grid-cols-4 gap-2">
-                    {timeSlots.map((time) => (
-                      <button
-                        key={time}
-                        onClick={() => setSelectedTime(time)}
-                        className={`
-                          p-2 rounded-lg border transition-all duration-300 hover:scale-105
-                          ${selectedTime === time 
-                            ? 'bg-green-500 text-white border-green-500 hover:bg-green-600' 
-                            : 'border-green-200 hover:border-green-300'}
-                        `}
-                      >
-                        {time}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedDate && selectedTime && (
-                <button
-                  className="w-full p-3 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
-                  onClick={() => setCurrentStep(2)}
-                >
-                  Continue to Consultation Type
-                </button>
-              )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleInputChange}
+            placeholder="Full Name"
+            required
+            className="w-full px-4 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleInputChange}
+            placeholder="Email Address"
+            required
+            className="w-full px-4 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <input
+            type="tel"
+            name="phone"
+            value={form.phone}
+            onChange={handleInputChange}
+            placeholder="10-Digit Phone Number"
+            required
+            className="w-full px-4 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          
+          {isOtpSent && !isOtpVerified && (
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                placeholder="Enter 6-Digit OTP"
+                value={enteredOtp}
+                onChange={(e) => setEnteredOtp(e.target.value)}
+                maxLength={6}
+                className="flex-grow px-4 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <button 
+                type="button" 
+                onClick={handleVerifyOtp}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+              >
+                Verify OTP
+              </button>
             </div>
           )}
-
-          {currentStep === 2 && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-green-700">Select Consultation Type</h3>
-              <div className="grid gap-4">
-                {appointmentTypes.map((type) => (
-                  <div
-                    key={type.id}
-                    className={`
-                      p-4 border rounded-lg cursor-pointer transition-all duration-300
-                      ${selectedType === type.id ? 'border-green-500 bg-green-50' : ''}
-                      hover:border-green-300 hover:bg-green-50
-                    `}
-                    onClick={() => setSelectedType(type.id)}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-semibold text-green-700">{type.type}</h4>
-                        <p className="text-sm text-gray-600">{type.description}</p>
-                        <p className="text-sm text-gray-600">{type.duration} minutes</p>
-                      </div>
-                      <div className="text-lg font-semibold text-green-600">${type.price}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {selectedType && (
-                <button
-                  className="w-full p-3 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
-                  onClick={() => setCurrentStep(3)}
-                >
-                  Continue to Patient Details
-                </button>
-              )}
-            </div>
+          
+          {!isOtpSent && (
+            <button 
+              type="button" 
+              onClick={handleSendOtp}
+              className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              Send OTP
+            </button>
           )}
+          
+          <textarea
+            name="disease_description"
+            value={form.disease_description}
+            onChange={handleInputChange}
+            placeholder="Brief Description of Condition"
+            required
+            disabled={!isOtpVerified}
+            className="w-full px-4 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+          
+          <input
+            type="date"
+            name="appointment_date"
+            value={form.appointment_date}
+            onChange={handleInputChange}
+            min={new Date().toISOString().split('T')[0]}
+            required
+            className={`w-full px-4 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+              isBlockedDate ? "bg-red-100" : ""
+            }`}
+          />
+          
+          {isBlockedDate && <p className="text-red-500 text-sm">This date is not available. Please choose another date.</p>}
 
-          {currentStep === 3 && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-green-700">Enter Patient Details</h3>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    value={patientInfo.name || ''}
-                    onChange={(e) =>
-                      setPatientInfo({ ...patientInfo, name: e.target.value })
-                    }
-                    placeholder="Full Name"
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                  {validationErrors.name && (
-                    <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={patientInfo.email || ''}
-                    onChange={(e) =>
-                      setPatientInfo({ ...patientInfo, email: e.target.value })
-                    }
-                    placeholder="Email Address"
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                  {validationErrors.email && (
-                    <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={patientInfo.phone || ''}
-                    onChange={(e) =>
-                      setPatientInfo({ ...patientInfo, phone: e.target.value })
-                    }
-                    placeholder="Phone Number"
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                  {validationErrors.phone && (
-                    <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Main Complaints
-                  </label>
-                  <textarea
-                    value={patientInfo.mainComplaints || ''}
-                    onChange={(e) =>
-                      setPatientInfo({ ...patientInfo, mainComplaints: e.target.value })
-                    }
-                    placeholder="Describe your main health concerns"
-                    rows={4}
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                  {validationErrors.mainComplaints && (
-                    <p className="text-red-500 text-sm mt-1">{validationErrors.mainComplaints}</p>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleSubmit}
-                  className="w-full p-3 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors disabled:opacity-50"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Book Appointment'}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {bookingComplete && (
-            <div className="text-center p-6">
-              <h2 className="text-green-700 text-lg font-semibold">Booking Confirmed!</h2>
-              <p className="text-gray-600">Thank you for booking an appointment with us.</p>
-            </div>
-          )}
-        </div>
+          <select
+            name="appointment_time"
+            value={form.appointment_time}
+            onChange={handleInputChange}
+            required
+            disabled={!isOtpVerified || isBlockedDate}
+            className="w-full px-4 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            <option value="">Select Available Time Slot</option>
+            {TIME_SLOTS.map((slot) => (
+              <option 
+                key={slot.value} 
+                value={slot.value}
+                disabled={bookedSlots.includes(slot.value)} // Disable booked slots
+              >
+                {slot.label}
+              </option>
+            ))}
+          </select>
+          
+          <button 
+            type="submit" 
+            disabled={!isOtpVerified || isBlockedDate}
+            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            Book Appointment
+          </button>
+        </form>
       </div>
     </div>
   );
-};
-
-export default Appointment;
+}
