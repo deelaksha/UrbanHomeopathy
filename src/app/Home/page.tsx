@@ -166,7 +166,7 @@ const Home = () => {
         </div>
       </section>
 
-    {/* Doctor Section */}
+{/* Doctor Section */}
 <section className="py-24 bg-gradient-to-r from-green-50 via-white to-green-50 text-green-900 relative overflow-hidden">
   <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-green-50 opacity-40 pointer-events-none"></div>
   <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -180,7 +180,7 @@ const Home = () => {
         Meet Dr. Tejaswini K B
       </h2>
       <p className="text-lg md:text-xl max-w-3xl mx-auto text-green-700">
-        I’m Dr. Tejaswini K B, here at Urban Care Homeopathy to support and guide you towards better health. With over a decade of clinical experience, I’m committed to offering personalized treatment plans tailored to your needs.
+        I&rsquo;m Dr. Tejaswini K B, here at Urban Care Homeopathy to support and guide you towards better health. With over a decade of clinical experience, I&rsquo;m committed to offering personalized treatment plans tailored to your needs.
       </p>
     </motion.div>
 
@@ -192,9 +192,9 @@ const Home = () => {
         className="space-y-8 bg-white shadow-xl rounded-lg p-6 md:p-8 transform hover:scale-105 transition-transform duration-300 border-l-4 border-green-200 w-full max-w-lg"
       >
         <p className="text-lg md:text-xl max-w-3xl mx-auto text-green-700">
-          With top honors from Father Muller Homeopathic Medical College, Mangalore, and a Postgraduate degree from Government Homeopathic Medical College, Bangalore, I’m equipped with the knowledge to address a wide range of health concerns with confidence.
+          With top honors from Father Muller Homeopathic Medical College, Mangalore, and a Postgraduate degree from Government Homeopathic Medical College, Bangalore, I&rsquo;m equipped with the knowledge to address a wide range of health concerns with confidence.
           <br /><br />
-          My passion for medicine drives me to make a positive impact on my patients' lives, and I work closely with you to understand your unique health needs and craft a treatment plan that fits your lifestyle and goals.
+          My passion for medicine drives me to make a positive impact on my patients&rsquo; lives, and I work closely with you to understand your unique health needs and craft a treatment plan that fits your lifestyle and goals.
           <br /><br />
           I look forward to partnering with you on your journey to better health.
         </p>
@@ -208,7 +208,7 @@ const Home = () => {
         className="relative w-full max-w-xs md:max-w-md rounded-lg overflow-hidden flex-shrink-0"
       >
         <Image
-          src="/home_images/dr.png" // Make sure this path is correct
+          src="/home_images/dr.png"
           alt="Dr. Tejaswini"
           width={500}
           height={500}
@@ -218,6 +218,7 @@ const Home = () => {
     </div>
   </div>
 </section>
+
 
 
       <TestimonialShowcase />
