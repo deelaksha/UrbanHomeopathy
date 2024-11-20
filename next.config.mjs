@@ -1,7 +1,7 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    reactStrictMode: false, // Enable Strict Mode (set to false to disable)
-  };
-  
-  export default nextConfig;
-  
+// next.config.mjs
+
+export default {
+  images: {
+    domains: ['img.youtube.com'], // Allow YouTube image domains
+  },
+}
