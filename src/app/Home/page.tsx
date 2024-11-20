@@ -166,55 +166,59 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Doctor Section */}
-      <section className="py-24 bg-gradient-to-r from-green-50 via-white to-green-50 text-green-900 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-green-50 opacity-40 pointer-events-none"></div>
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: 'easeOut' }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 md:mb-8 text-green-800 leading-tight">
-              Meet Dr. Tejasmini
-            </h2>
-            <p className="text-lg md:text-xl max-w-3xl mx-auto text-green-700">
-              I’m Dr. Tejasmini. I am here at Urban Care Homeopathy to listen, support, and guide you in every step you take towards better health.
-            </p>
-          </motion.div>
+     {/* Doctor Section */}
+<section className="py-24 bg-gradient-to-r from-green-50 via-white to-green-50 text-green-900 relative overflow-hidden">
+  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-green-50 opacity-40 pointer-events-none"></div>
+  <div className="container mx-auto px-6 lg:px-12 relative z-10">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.2, ease: 'easeOut' }}
+      className="text-center mb-16"
+    >
+      <h2 className="text-4xl md:text-5xl font-bold mb-6 md:mb-8 text-green-800 leading-tight">
+        Meet Dr. Tejaswini K B
+      </h2>
+      <p className="text-lg md:text-xl max-w-3xl mx-auto text-green-700">
+        I’m Dr. Tejaswini K B, here at Urban Care Homeopathy to support and guide you towards better health. With over a decade of clinical experience, I’m committed to offering personalized treatment plans tailored to your needs.
+      </p>
+    </motion.div>
 
-          <div className="flex flex-col md:flex-row gap-12 items-center justify-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1.2, ease: 'easeOut' }}
-              className="space-y-8 bg-white shadow-xl rounded-lg p-6 md:p-8 transform hover:scale-105 transition-transform duration-300 border-l-4 border-green-200 w-full max-w-lg"
-            >
-              <p className="text-base md:text-lg leading-relaxed text-green-800">
-                I graduated with top honors from Father Muller Homeopathic Medical College, Mangalore...
-              </p>
-              {/* Add remaining content here */}
-              <h3 className="text-xl md:text-2xl font-bold text-green-600">Dr. Tejasmini</h3>
-            </motion.div>
+    <div className="flex flex-col md:flex-row gap-12 items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
+        className="space-y-8 bg-white shadow-xl rounded-lg p-6 md:p-8 transform hover:scale-105 transition-transform duration-300 border-l-4 border-green-200 w-full max-w-lg"
+      >
+        <p className="text-lg md:text-xl max-w-3xl mx-auto text-green-700">
+          With top honors from Father Muller Homeopathic Medical College, Mangalore, and a Postgraduate degree from Government Homeopathic Medical College, Bangalore, I’m equipped with the knowledge to address a wide range of health concerns with confidence.
+          <br /><br />
+          My passion for medicine drives me to make a positive impact on my patients' lives, and I work closely with you to understand your unique health needs and craft a treatment plan that fits your lifestyle and goals.
+          <br /><br />
+          I look forward to partnering with you on your journey to better health.
+        </p>
+        <h3 className="text-xl md:text-2xl font-bold text-green-600">Dr. Tejaswini K B</h3>
+      </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1.2, ease: 'easeOut' }}
-              className="relative w-full max-w-xs md:max-w-md rounded-lg overflow-hidden flex-shrink-0"
-            >
-              <Image
-                src="/home_images/dr.png"
-                alt="Dr. Tejasmini"
-                width={500}
-                height={500}
-                className="rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-500 hover:shadow-green-300 border-4 border-green-200"
-              />
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
+        className="relative w-full max-w-xs md:max-w-md rounded-lg overflow-hidden flex-shrink-0"
+      >
+        <Image
+          src="/home_images/dr.png"
+          alt="Dr. Tejaswini"
+          width={500}
+          height={500}
+          className="rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-500 hover:shadow-green-300 border-4 border-green-200"
+        />
+      </motion.div>
+    </div>
+  </div>
+</section>
+
 
       <TestimonialShowcase />
       <Footer />
