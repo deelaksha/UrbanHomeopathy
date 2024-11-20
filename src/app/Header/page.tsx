@@ -32,7 +32,7 @@ const Header = () => {
           <div className="flex-shrink-0 flex items-center">
             <Leaf className="h-8 w-8 text-green-600" />
             <span className="ml-2 text-xl font-semibold text-gray-800">
-              HolisticHealth
+              Urban Homeopathy
             </span>
           </div>
 

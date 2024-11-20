@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { supabase } from "../../../lib/supabaseClient";
+import Header from "../Header/page";
 
 const isValidPhoneNumber = (phone: string): boolean => /^[0-9]{10}$/.test(phone);
 const generateOTP = (): string => Math.floor(100000 + Math.random() * 900000).toString();
@@ -148,6 +149,8 @@ export default function AppointmentBookingForm() {
   };
 
   return (
+    <>
+    <Header/>
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-green-50 rounded-xl shadow-lg p-8">
         <h1 className="text-3xl font-bold text-green-700 mb-6 text-center">Book Appointment</h1>
@@ -267,5 +270,6 @@ export default function AppointmentBookingForm() {
         </form>
       </div>
     </div>
+    </>
   );
 }

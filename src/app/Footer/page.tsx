@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { 
   Facebook, 
@@ -24,12 +25,9 @@ const Footer = () => {
   ];
 
   const quickLinks = [
-    'Book Appointment',
-    'Emergency Care',
-    'Online Consultation',
-    'Find a Doctor',
-    'Download Forms',
-    'Insurance Partners'
+    { text: 'Home Page', href: '/' },
+    { text: 'Book Appointment', href: '/Appointment' },
+    { text: 'Blog & Post', href: '/Blog' },
   ];
 
   const currentYear = new Date().getFullYear();
@@ -53,35 +51,7 @@ const Footer = () => {
             />
           ))}
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="mb-6 md:mb-0">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Join Our Wellness Journey
-              </h3>
-              <p className="text-green-100">
-                Subscribe to receive natural healing tips and exclusive offers
-              </p>
-            </div>
-            <div className="w-full md:w-auto">
-              <form className="flex flex-col sm:flex-row gap-4">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="px-4 py-3 rounded-lg focus:outline-none focus:ring-2 
-                           focus:ring-green-400 transition-all duration-300 min-w-[300px]"
-                />
-                <button
-                  type="submit"
-                  className="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold
-                           hover:bg-green-50 transform hover:scale-105 transition-all duration-300"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       {/* Main Footer Content */}
@@ -92,7 +62,7 @@ const Footer = () => {
             <div className="flex items-center space-x-2">
               <Leaf className="h-8 w-8 text-green-600" />
               <span className="text-2xl font-bold text-gray-800">
-                HolisticHealth
+                Urban Homeopathy
               </span>
             </div>
             <p className="text-gray-600 leading-relaxed">
@@ -100,20 +70,32 @@ const Footer = () => {
               treatments, backed by modern research and decades of experience.
             </p>
             <div className="flex space-x-4">
-              {[Facebook, Twitter, Instagram, Youtube].map((Icon, index) => (
-                <a
-                  key={index}
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center
-                           hover:bg-green-600 group transition-all duration-300 transform hover:scale-110"
-                >
-                  <Icon 
-                    size={20} 
-                    className="text-green-600 group-hover:text-white transition-colors duration-300" 
-                  />
-                </a>
-              ))}
-            </div>
+  {[Facebook, Twitter, Instagram, Youtube].map((Icon, index) => {
+    const socialLinks = [
+      'https://facebook.com/yourprofile',  // Replace with your Facebook link
+      'https://twitter.com/yourprofile',   // Replace with your Twitter link
+      'https://www.instagram.com/dr.tejaswini.k.b?igsh=MWs4d2JudzF6cmZwNg==', // Replace with your Instagram link
+      'https://www.youtube.com/@bestofhomeopathy248',   // Replace with your YouTube link
+    ];
+
+    return (
+      <a
+        key={index}
+        href={socialLinks[index]} // Use the corresponding link from socialLinks array
+        className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center
+                 hover:bg-green-600 group transition-all duration-300 transform hover:scale-110"
+        target="_blank"  // Open the link in a new tab
+        rel="noopener noreferrer"  // Security enhancement for links that open in new tab
+      >
+        <Icon 
+          size={20} 
+          className="text-green-600 group-hover:text-white transition-colors duration-300" 
+        />
+      </a>
+    );
+  })}
+</div>
+
           </div>
 
           {/* Quick Links */}
@@ -125,7 +107,7 @@ const Footer = () => {
               {quickLinks.map((link, index) => (
                 <li key={index}>
                   <a
-                    href="#"
+                    href={link.href} // Use the href from the quickLinks array
                     className="text-gray-600 hover:text-green-600 flex items-center
                              group transition-colors duration-300"
                   >
@@ -133,7 +115,7 @@ const Footer = () => {
                       size={16} 
                       className="mr-2 transform group-hover:translate-x-1 transition-transform duration-300" 
                     />
-                    {link}
+                    {link.text} {/* Display the link text */}
                   </a>
                 </li>
               ))}
@@ -149,11 +131,12 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-green-600 mt-1" />
                 <p className="text-gray-600">
-                  123 Healing Street
+                  #123 
                   <br />
-                  Wellness District
+                  Basaveshwar Nagar
+
                   <br />
-                  Natural City, NC 12345
+                  Banglore
                 </p>
               </div>
               <a
@@ -195,7 +178,7 @@ const Footer = () => {
         <div className="mt-16 pt-8 border-t border-green-200">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-600">
-              © {currentYear} HolisticHealth. All rights reserved.
+              © {currentYear} Urban Homeopathy. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-gray-600 hover:text-green-600 transition-colors duration-300">

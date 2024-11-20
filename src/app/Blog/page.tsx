@@ -1,133 +1,154 @@
-import React from 'react';
-import { Calendar, Clock, User, BookOpen, ArrowRight } from 'lucide-react';
+'use client';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../../lib/supabaseClient';
+import { Loader, Leaf, Heart, Clock, User } from 'lucide-react';
+import Header from '../Header/page';
+import Link from 'next/link';  // Import Next.js Link for navigation
 
-const BlogPage = () => {
-  const blogPosts = [
-    {
-      id: 1,
-      title: "The Power of Natural Healing: Understanding Homeopathy",
-      excerpt: "Discover how homeopathic treatments can help restore your body's natural balance and promote holistic wellness through gentle, personalized care.",
-      author: "Dr. Sarah Mitchell",
-      readTime: "5 min read",
-      date: "October 24, 2024",
-      category: "Wellness",
-      image: "/api/placeholder/800/400"
-    },
-    {
-      id: 2,
-      title: "Common Myths About Homeopathic Medicine Debunked",
-      excerpt: "Let's explore and clarify some of the most common misconceptions about homeopathy and understand its true principles and benefits.",
-      author: "Dr. Michael Chen",
-      readTime: "4 min read",
-      date: "October 22, 2024",
-      category: "Education",
-      image: "/api/placeholder/800/400"
-    },
-    {
-      id: 3,
-      title: "Seasonal Allergies: A Homeopathic Approach",
-      excerpt: "Learn how homeopathic remedies can provide natural relief from seasonal allergies without the side effects of conventional medications.",
-      author: "Dr. Emma Thompson",
-      readTime: "6 min read",
-      date: "October 20, 2024",
-      category: "Treatment",
-      image: "/api/placeholder/800/400"
-    }
-  ];
+interface Blog {
+  id: number;
+  created_at: string;
+  title: string;
+  description: string;
+  author: string;
+  image_url: string | null;
+}
 
-  return (
-    <div className="min-h-screen bg-sage-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-emerald-50 to-purple-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-emerald-900 mb-4">
-              Holistic Healing Insights
-            </h1>
-            <p className="text-xl text-emerald-700 max-w-2xl mx-auto">
-              Explore the latest in homeopathic medicine, wellness tips, and natural healing approaches.
-            </p>
+const Blogs = () => {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCard, setActiveCard] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from('blogs').select('*');
+      if (error) {
+        console.error('Error fetching blogs:', error.message);
+      } else {
+        setBlogs(data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchBlogs();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white">
+        <div className="relative">
+          <div className="animate-spin">
+            <Loader className="w-12 h-12 text-green-600" />
           </div>
+          <div className="absolute -top-1 -left-1 w-14 h-14 border-2 border-green-200 rounded-full animate-pulse" />
         </div>
       </div>
+    );
+  }
 
-      {/* Featured Posts */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  return (
+    <>
+    <Header/>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-20 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="relative">
+              <Leaf className="w-12 h-12 text-green-500 animate-bounce" />
+              <div className="absolute inset-0 bg-green-200 rounded-full animate-pulse opacity-25" />
+            </div>
+          </div>
+          
+          <h1 className="text-5xl font-bold text-gray-900 mb-6 relative">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-emerald-500">
+              Health & Wellness Blog
+            </span>
+          </h1>
+          
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto relative">
+            Discover insights for a healthier, more balanced life
+          </p>
+          
+          <div className="absolute w-64 h-64 -top-12 left-1/2 -translate-x-1/2 bg-green-100 rounded-full filter blur-3xl opacity-25 animate-pulse" />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.map((post) => (
-            <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 border border-emerald-100">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex items-center space-x-2 text-sm text-emerald-600 mb-3">
-                  <span className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full text-xs">
-                    {post.category}
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center">
-                    <Clock className="w-4 h-4 mr-1" />
-                    {post.readTime}
-                  </span>
+          {blogs.map((blog, index) => (
+            <article
+              key={blog.id}
+              className="group relative bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 ease-out hover:shadow-2xl hover:-translate-y-2"
+              onMouseEnter={() => setActiveCard(blog.id)}
+              onMouseLeave={() => setActiveCard(null)}
+              style={{
+                animationDelay: `${index * 150}ms`,
+                animation: 'fadeInUp 0.8s ease-out forwards',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-green-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              {blog.image_url && (
+                <div className="aspect-video overflow-hidden">
+                  <img
+                    src={blog.image_url}
+                    alt={blog.title}
+                    className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110"
+                  />
+                </div>
+              )}
+              
+              <div className="p-8 relative">
+                <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center gap-1">
+                    <User className="w-4 h-4 text-green-500" />
+                    <span className="font-medium text-green-700">{blog.author}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4 text-green-500" />
+                    <time>{new Date(blog.created_at).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}</time>
+                  </div>
                 </div>
                 
-                <h2 className="text-xl font-semibold text-emerald-900 mb-2">
-                  {post.title}
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4 transition-colors duration-300 group-hover:text-green-700">
+                  {blog.title}
                 </h2>
-                <p className="text-emerald-700 mb-4">
-                  {post.excerpt}
+                
+                <p className="text-gray-600 line-clamp-3 mb-6 leading-relaxed">
+                  {blog.description}
                 </p>
                 
-                <div className="flex items-center justify-between mt-4">
-                  <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-emerald-600">{post.author}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-emerald-600">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    {post.date}
-                  </div>
-                </div>
-                
-                <button className="mt-4 w-full bg-emerald-50 text-emerald-700 py-2 px-4 rounded-md flex items-center justify-center hover:bg-emerald-100 transition-colors duration-200">
-                  Read More <ArrowRight className="w-4 h-4 ml-2" />
-                </button>
+                <Link href={`/Blog/${blog.id}`} passHref>
+  <button className="inline-flex items-center px-4 py-2 rounded-full bg-green-50 text-green-700 font-medium transition-all duration-300 group-hover:bg-green-600 group-hover:text-white">
+    Read Article
+    <Heart className={`w-4 h-4 ml-2 transition-all duration-300 ${activeCard === blog.id ? 'animate-ping' : ''}`} />
+  </button>
+</Link>
+
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>
 
-      {/* Newsletter Section */}
-      <div className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-emerald-50 to-purple-50 rounded-2xl p-8 md:p-12 border border-emerald-100">
-            <div className="text-center max-w-2xl mx-auto">
-              <BookOpen className="w-12 h-12 text-emerald-600 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-emerald-900 mb-4">
-                Stay Updated with Our Newsletter
-              </h2>
-              <p className="text-emerald-700 mb-6">
-                Get the latest insights on natural healing and homeopathic treatments delivered to your inbox.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="px-4 py-2 border border-emerald-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 flex-grow max-w-md"
-                />
-                <button className="bg-emerald-600 text-white px-6 py-2 rounded-md hover:bg-emerald-700 transition-colors duration-200">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(40px) scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+      `}</style>
     </div>
+    </>
   );
 };
 
-export default BlogPage;
+export default Blogs;
