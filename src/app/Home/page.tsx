@@ -166,7 +166,7 @@ const Home = () => {
         </div>
       </section>
 
-     {/* Doctor Section */}
+    {/* Doctor Section */}
 <section className="py-24 bg-gradient-to-r from-green-50 via-white to-green-50 text-green-900 relative overflow-hidden">
   <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-green-50 opacity-40 pointer-events-none"></div>
   <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -208,7 +208,7 @@ const Home = () => {
         className="relative w-full max-w-xs md:max-w-md rounded-lg overflow-hidden flex-shrink-0"
       >
         <Image
-          src="/home_images/dr.png"
+          src="/home_images/dr.png" // Make sure this path is correct
           alt="Dr. Tejaswini"
           width={500}
           height={500}
