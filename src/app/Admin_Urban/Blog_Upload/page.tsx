@@ -108,12 +108,20 @@ const CreateBlog = () => {
         content: 'Blog post created successfully!' 
       });
       resetForm();
-    } catch (error: any) {
-      setMessage({ 
-        type: 'error', 
-        content: `Error creating blog post: ${error.message}` 
-      });
-    } finally {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage({ 
+          type: 'error', 
+          content: `Error creating blog post: ${error.message}` 
+        });
+      } else {
+        setMessage({ 
+          type: 'error', 
+          content: 'An unknown error occurred while creating the blog post.' 
+        });
+      }
+    }
+     finally {
       setIsSubmitting(false);
     }
   };
